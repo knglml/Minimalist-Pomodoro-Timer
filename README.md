@@ -1,6 +1,5 @@
 # Minimalist-Pomodoro-Timer
 Clean pomodoro timer (25min work / 5min break) with sound alerts, session tracking, dark/light mode
-# Minimal Pomodoro Timer
 极简网页番茄钟，原生前端实现，无任何第三方依赖，一键部署Github Pages在线使用。
 
 ## 功能
