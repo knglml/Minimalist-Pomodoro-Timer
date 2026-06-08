@@ -3,198 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>极简番茄钟 | Pomodoro</title>
+    <title>极简番茄专注钟 | Pomodoro Timer</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
-
         :root {
-            --bg: #f8f9fa;
-            --card: #ffffff;
-            --text: #2d3748;
-            --primary: #4f46e5;
-            --start: #10b981;
-            --pause: #f59e0b;
-            --reset: #ef4444;
-        }
-
-        .dark {
-            --bg: #121212;
-            --card: #1e1e1e;
-            --text: #e5e7eb;
+            --bg-primary: #f7f8fa;
+            --card-bg: #ffffff;
+            --text-main: #1f2937;
+            --text-sub: #6b7280;
             --primary: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            --transition: all 0.25s ease;
         }
-
+        body.dark {
+            --bg-primary: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-sub: #94a3b8;
+        }
         body {
-            background: var(--bg);
-            color: var(--text);
             min-height: 100vh;
+            background: var(--bg-primary);
+            color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            transition: var(--transition);
         }
-
+        .dark-toggle {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            padding: 8px 16px;
+            border-radius: 999px;
+            border: 1px solid #ddd;
+            background: var(--card-bg);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+        }
         .container {
-            background: var(--card);
-            padding: 40px 32px;
-            border-radius: 24px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            background: var(--card-bg);
+            width: min(92%, 440px);
+            padding: 48px 32px;
+            border-radius: 28px;
+            box-shadow: var(--shadow);
             text-align: center;
-            width: 100%;
-            max-width: 420px;
         }
-
         .title {
-            font-size: 24px;
-            margin-bottom: 20px;
+            font-size: 26px;
             font-weight: 600;
+            margin-bottom: 12px;
         }
-
-        .time {
-            font-size: 72px;
-            font-weight: 700;
-            margin: 30px 0;
-            letter-spacing: 2px;
-        }
-
-        .mode-text {
-            font-size: 16px;
+        .mode-label {
             color: var(--primary);
-            margin-bottom: 10px;
+            font-size: 16px;
             font-weight: 500;
+            margin-bottom: 36px;
         }
-
-        .btn-group {
+        .time-display {
+            font-size: 80px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            margin: 16px 0 40px;
+        }
+        .btn-row {
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 20px;
+            gap: 12px;
             flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 28px;
         }
-
         button {
-            padding: 12px 18px;
+            padding: 13px 20px;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 15px;
             font-weight: 500;
+            color: white;
             cursor: pointer;
-            transition: 0.2s;
+            transition: var(--transition);
         }
-
         button:hover {
-            opacity: 0.9;
-            transform: scale(1.03);
+            transform: translateY(-2px);
+            opacity: 0.92;
         }
-
-        .start { background: var(--start); color: white; }
-        .pause { background: var(--pause); color: white; }
-        .reset { background: var(--reset); color: white; }
-        .toggle { background: var(--primary); color: white; }
-
-        .dark-mode {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 8px 14px;
-            border-radius: 999px;
-            background: var(--card);
-            border: 1px solid #ddd;
-            cursor: pointer;
-        }
-
-        .counter {
-            margin-top: 16px;
+        .start { background-color: var(--success); }
+        .pause { background-color: var(--warning); }
+        .reset { background-color: var(--danger); }
+        .switch-mode { background-color: var(--primary); }
+        .stat-text {
             font-size: 14px;
-            color: #888;
+            color: var(--text-sub);
         }
     </style>
 </head>
-
 <body>
-    <button class="dark-mode" id="darkBtn">深色模式</button>
-
+    <button class="dark-toggle" id="darkBtn">深色模式</button>
     <div class="container">
-        <div class="title">番茄专注时钟</div>
-        <div class="mode-text" id="modeTxt">工作模式</div>
-        <div class="time" id="clock">25:00</div>
-
-        <div class="btn-group">
-            <button class="start" id="start">开始</button>
-            <button class="pause" id="pause">暂停</button>
-            <button class="reset" id="reset">重置</button>
-            <button class="toggle" id="switchMode">切换休息</button>
+        <div class="title">番茄专注计时器</div>
+        <div class="mode-label" id="modeTxt">工作模式 · 25分钟</div>
+        <div class="time-display" id="clock">25:00</div>
+        <div class="btn-row">
+            <button class="start" id="startBtn">开始</button>
+            <button class="pause" id="pauseBtn">暂停</button>
+            <button class="reset" id="resetBtn">重置</button>
+            <button class="switch-mode" id="switchBtn">切换休息</button>
         </div>
-
-        <div class="counter" id="counter">已完成 0 次专注</div>
+        <div class="stat-text" id="countText">已完成 0 次专注周期</div>
     </div>
 
     <script>
+        // 基础配置
+        const WORK_SECONDS = 25 * 60;
+        const REST_SECONDS = 5 * 60;
+        let currentTime = WORK_SECONDS;
+        let isWorkMode = true;
+        let timerInterval = null;
+        let finishedCount = 0;
+
+        // DOM元素绑定
         const clock = document.getElementById('clock');
-        const start = document.getElementById('start');
-        const pause = document.getElementById('pause');
-        const reset = document.getElementById('reset');
-        const switchMode = document.getElementById('switchMode');
         const modeTxt = document.getElementById('modeTxt');
-        const counter = document.getElementById('counter');
+        const countText = document.getElementById('countText');
+        const startBtn = document.getElementById('startBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const switchBtn = document.getElementById('switchBtn');
         const darkBtn = document.getElementById('darkBtn');
 
-        let workTime = 25 * 60;
-        let restTime = 5 * 60;
-        let current = workTime;
-        let isWorking = true;
-        let timer = null;
-        let count = 0;
-
-        function format(time) {
-            const m = String(Math.floor(time / 60)).padStart(2, '0');
-            const s = String(time % 60).padStart(2, '0');
-            return `${m}:${s}`;
+        // 时间格式化函数
+        function formatSecond(totalSec) {
+            const min = String(Math.floor(totalSec / 60)).padStart(2, '0');
+            const sec = String(totalSec % 60).padStart(2, '0');
+            return `${min}:${sec}`;
         }
+        clock.innerText = formatSecond(currentTime);
 
-        clock.innerText = format(current);
-
-        function playAlarm() {
+        // 结束提示音效
+        function playAlertSound() {
             const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+            audio.volume = 0.6;
             audio.play();
         }
 
-        start.onclick = () => {
-            clearInterval(timer);
-            timer = setInterval(() => {
-                current--;
-                clock.innerText = format(current);
-
-                if (current <= 0) {
-                    clearInterval(timer);
-                    playAlarm();
-                    if (isWorking) count++;
-                    counter.innerText = `已完成 ${count} 次专注`;
+        // 启动倒计时
+        startBtn.onclick = () => {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                currentTime--;
+                clock.innerText = formatSecond(currentTime);
+                if (currentTime <= 0) {
+                    clearInterval(timerInterval);
+                    playAlertSound();
+                    if (isWorkMode) finishedCount++;
+                    countText.innerText = `已完成 ${finishedCount} 次专注周期`;
                 }
             }, 1000);
         };
 
-        pause.onclick = () => clearInterval(timer);
-        reset.onclick = () => {
-            clearInterval(timer);
-            current = isWorking ? workTime : restTime;
-            clock.innerText = format(current);
+        // 暂停计时
+        pauseBtn.onclick = () => clearInterval(timerInterval);
+
+        // 重置计时
+        resetBtn.onclick = () => {
+            clearInterval(timerInterval);
+            currentTime = isWorkMode ? WORK_SECONDS : REST_SECONDS;
+            clock.innerText = formatSecond(currentTime);
         };
 
-        switchMode.onclick = () => {
-            clearInterval(timer);
-            isWorking = !isWorking;
-            current = isWorking ? workTime : restTime;
-            modeTxt.innerText = isWorking ? '工作模式' : '休息模式';
-            switchMode.innerText = isWorking ? '切换休息' : '切换工作';
-            clock.innerText = format(current);
+        // 切换工作/休息模式
+        switchBtn.onclick = () => {
+            clearInterval(timerInterval);
+            isWorkMode = !isWorkMode;
+            currentTime = isWorkMode ? WORK_SECONDS : REST_SECONDS;
+            modeTxt.innerText = isWorkMode ? '工作模式 · 25分钟' : '休息模式 · 5分钟';
+            switchBtn.innerText = isWorkMode ? '切换休息' : '切换工作';
+            clock.innerText = formatSecond(currentTime);
         };
 
+        // 深色浅色切换
         darkBtn.onclick = () => {
             document.body.classList.toggle('dark');
             darkBtn.innerText = document.body.classList.contains('dark') ? '浅色模式' : '深色模式';
