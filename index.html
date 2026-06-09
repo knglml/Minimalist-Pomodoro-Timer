@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="一个轻量、无依赖、支持深色模式的番茄专注计时器。">
     <title>极简番茄专注钟 | Pomodoro Timer</title>
     <style>
         * {
@@ -11,190 +12,332 @@
             box-sizing: border-box;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
+
         :root {
+            color-scheme: light;
             --bg-primary: #f7f8fa;
-            --card-bg: #ffffff;
+            --bg-accent: #e0e7ff;
+            --card-bg: rgba(255, 255, 255, 0.92);
             --text-main: #1f2937;
             --text-sub: #6b7280;
             --primary: #6366f1;
             --success: #10b981;
             --warning: #f59e0b;
             --danger: #ef4444;
-            --shadow: 0 12px 40px rgba(0, 0, 0, 0.08);
+            --ring: rgba(99, 102, 241, 0.24);
+            --shadow: 0 24px 70px rgba(31, 41, 55, 0.14);
             --transition: all 0.25s ease;
         }
+
         body.dark {
+            color-scheme: dark;
             --bg-primary: #0f172a;
-            --card-bg: #1e293b;
+            --bg-accent: #312e81;
+            --card-bg: rgba(30, 41, 59, 0.92);
             --text-main: #f1f5f9;
             --text-sub: #94a3b8;
+            --ring: rgba(129, 140, 248, 0.28);
+            --shadow: 0 24px 70px rgba(0, 0, 0, 0.32);
         }
+
         body {
             min-height: 100vh;
-            background: var(--bg-primary);
+            background:
+                radial-gradient(circle at top left, var(--bg-accent), transparent 34rem),
+                var(--bg-primary);
             color: var(--text-main);
             display: flex;
             align-items: center;
             justify-content: center;
+            padding: 24px;
             transition: var(--transition);
         }
+
         .dark-toggle {
             position: fixed;
             top: 24px;
             right: 24px;
-            padding: 8px 16px;
+            padding: 9px 16px;
             border-radius: 999px;
-            border: 1px solid #ddd;
+            border: 1px solid rgba(148, 163, 184, 0.28);
             background: var(--card-bg);
             color: var(--text-main);
             cursor: pointer;
             transition: var(--transition);
+            backdrop-filter: blur(14px);
         }
+
         .container {
             background: var(--card-bg);
-            width: min(92%, 440px);
+            width: min(100%, 460px);
             padding: 48px 32px;
-            border-radius: 28px;
+            border-radius: 30px;
             box-shadow: var(--shadow);
             text-align: center;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            backdrop-filter: blur(18px);
         }
+
+        .eyebrow {
+            color: var(--text-sub);
+            font-size: 13px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
         .title {
-            font-size: 26px;
-            font-weight: 600;
+            font-size: clamp(25px, 7vw, 32px);
+            font-weight: 700;
             margin-bottom: 12px;
         }
+
         .mode-label {
             color: var(--primary);
             font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 36px;
+            font-weight: 600;
+            margin-bottom: 28px;
         }
+
+        .progress-ring {
+            width: min(76vw, 260px);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            margin: 0 auto 32px;
+            background: conic-gradient(var(--primary) var(--progress, 0%), var(--ring) 0);
+            box-shadow: inset 0 0 0 12px rgba(255, 255, 255, 0.16);
+        }
+
         .time-display {
-            font-size: 80px;
-            font-weight: 700;
-            letter-spacing: 3px;
-            margin: 16px 0 40px;
+            width: calc(100% - 34px);
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: var(--card-bg);
+            display: grid;
+            place-items: center;
+            font-size: clamp(50px, 14vw, 76px);
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-variant-numeric: tabular-nums;
         }
+
         .btn-row {
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
             justify-content: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
+
         button {
             padding: 13px 20px;
             border: none;
             border-radius: 14px;
             font-size: 15px;
-            font-weight: 500;
+            font-weight: 600;
             color: white;
             cursor: pointer;
             transition: var(--transition);
         }
+
         button:hover {
             transform: translateY(-2px);
-            opacity: 0.92;
+            opacity: 0.94;
         }
+
+        button:focus-visible {
+            outline: 3px solid var(--ring);
+            outline-offset: 3px;
+        }
+
         .start { background-color: var(--success); }
         .pause { background-color: var(--warning); }
         .reset { background-color: var(--danger); }
         .switch-mode { background-color: var(--primary); }
-        .stat-text {
+
+        .stat-text,
+        .hint-text {
             font-size: 14px;
             color: var(--text-sub);
+        }
+
+        .hint-text {
+            margin-top: 8px;
+        }
+
+        @media (max-width: 480px) {
+            body {
+                align-items: flex-start;
+                padding-top: 84px;
+            }
+
+            .dark-toggle {
+                top: 16px;
+                right: 16px;
+            }
+
+            .container {
+                padding: 36px 20px;
+            }
+
+            button {
+                flex: 1 1 42%;
+            }
         }
     </style>
 </head>
 <body>
-    <button class="dark-toggle" id="darkBtn">深色模式</button>
-    <div class="container">
-        <div class="title">番茄专注计时器</div>
-        <div class="mode-label" id="modeTxt">工作模式 · 25分钟</div>
-        <div class="time-display" id="clock">25:00</div>
-        <div class="btn-row">
-            <button class="start" id="startBtn">开始</button>
-            <button class="pause" id="pauseBtn">暂停</button>
-            <button class="reset" id="resetBtn">重置</button>
-            <button class="switch-mode" id="switchBtn">切换休息</button>
+    <button class="dark-toggle" id="darkBtn" type="button" aria-pressed="false">深色模式</button>
+    <main class="container" aria-labelledby="appTitle">
+        <p class="eyebrow">Pomodoro Timer</p>
+        <h1 class="title" id="appTitle">番茄专注计时器</h1>
+        <p class="mode-label" id="modeTxt">工作模式 · 25分钟</p>
+        <div class="progress-ring" id="progressRing" aria-hidden="true">
+            <div class="time-display" id="clock" role="timer" aria-live="polite">25:00</div>
         </div>
-        <div class="stat-text" id="countText">已完成 0 次专注周期</div>
-    </div>
+        <div class="btn-row">
+            <button class="start" id="startBtn" type="button">开始</button>
+            <button class="pause" id="pauseBtn" type="button">暂停</button>
+            <button class="reset" id="resetBtn" type="button">重置</button>
+            <button class="switch-mode" id="switchBtn" type="button">切换休息</button>
+        </div>
+        <p class="stat-text" id="countText">已完成 0 次专注周期</p>
+        <p class="hint-text" id="statusText">准备开始一次专注。</p>
+    </main>
 
     <script>
-        // 基础配置
         const WORK_SECONDS = 25 * 60;
         const REST_SECONDS = 5 * 60;
+        const STORAGE_KEYS = {
+            theme: 'pomodoro-theme',
+            finishedCount: 'pomodoro-finished-count'
+        };
+
         let currentTime = WORK_SECONDS;
         let isWorkMode = true;
         let timerInterval = null;
-        let finishedCount = 0;
+        let finishedCount = Number(localStorage.getItem(STORAGE_KEYS.finishedCount)) || 0;
 
-        // DOM元素绑定
         const clock = document.getElementById('clock');
         const modeTxt = document.getElementById('modeTxt');
         const countText = document.getElementById('countText');
+        const statusText = document.getElementById('statusText');
+        const progressRing = document.getElementById('progressRing');
         const startBtn = document.getElementById('startBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         const resetBtn = document.getElementById('resetBtn');
         const switchBtn = document.getElementById('switchBtn');
         const darkBtn = document.getElementById('darkBtn');
 
-        // 时间格式化函数
         function formatSecond(totalSec) {
-            const min = String(Math.floor(totalSec / 60)).padStart(2, '0');
-            const sec = String(totalSec % 60).padStart(2, '0');
+            const safeSeconds = Math.max(totalSec, 0);
+            const min = String(Math.floor(safeSeconds / 60)).padStart(2, '0');
+            const sec = String(safeSeconds % 60).padStart(2, '0');
             return `${min}:${sec}`;
         }
-        clock.innerText = formatSecond(currentTime);
 
-        // 结束提示音效
-        function playAlertSound() {
-            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
-            audio.volume = 0.6;
-            audio.play();
+        function getModeDuration() {
+            return isWorkMode ? WORK_SECONDS : REST_SECONDS;
         }
 
-        // 启动倒计时
-        startBtn.onclick = () => {
+        function updateProgress() {
+            const duration = getModeDuration();
+            const completedRatio = 1 - currentTime / duration;
+            const progress = Math.min(Math.max(completedRatio, 0), 1) * 100;
+            progressRing.style.setProperty('--progress', `${progress}%`);
+        }
+
+        function updateCountText() {
+            countText.innerText = `已完成 ${finishedCount} 次专注周期`;
+        }
+
+        function updateDisplay() {
+            clock.innerText = formatSecond(currentTime);
+            modeTxt.innerText = isWorkMode ? '工作模式 · 25分钟' : '休息模式 · 5分钟';
+            switchBtn.innerText = isWorkMode ? '切换休息' : '切换工作';
+            updateCountText();
+            updateProgress();
+        }
+
+        function setStatus(message) {
+            statusText.innerText = message;
+        }
+
+        function stopTimer() {
             clearInterval(timerInterval);
+            timerInterval = null;
+        }
+
+        function playAlertSound() {
+            const audio = new Audio('https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3');
+            audio.volume = 0.55;
+            audio.play().catch(() => {
+                setStatus('计时结束，请查看当前模式。');
+            });
+        }
+
+        function finishCurrentRound() {
+            stopTimer();
+            currentTime = 0;
+            if (isWorkMode) {
+                finishedCount++;
+                localStorage.setItem(STORAGE_KEYS.finishedCount, String(finishedCount));
+            }
+            updateDisplay();
+            setStatus(isWorkMode ? '专注完成！可以切换到休息模式。' : '休息结束！可以回到工作模式。');
+            playAlertSound();
+        }
+
+        function applyTheme(theme) {
+            const shouldUseDark = theme === 'dark';
+            document.body.classList.toggle('dark', shouldUseDark);
+            darkBtn.innerText = shouldUseDark ? '浅色模式' : '深色模式';
+            darkBtn.setAttribute('aria-pressed', String(shouldUseDark));
+            localStorage.setItem(STORAGE_KEYS.theme, shouldUseDark ? 'dark' : 'light');
+        }
+
+        startBtn.onclick = () => {
+            if (timerInterval) return;
+            if (currentTime <= 0) currentTime = getModeDuration();
+            setStatus(isWorkMode ? '正在专注，请保持节奏。' : '正在休息，请放松一下。');
             timerInterval = setInterval(() => {
                 currentTime--;
-                clock.innerText = formatSecond(currentTime);
-                if (currentTime <= 0) {
-                    clearInterval(timerInterval);
-                    playAlertSound();
-                    if (isWorkMode) finishedCount++;
-                    countText.innerText = `已完成 ${finishedCount} 次专注周期`;
-                }
+                updateDisplay();
+                if (currentTime <= 0) finishCurrentRound();
             }, 1000);
         };
 
-        // 暂停计时
-        pauseBtn.onclick = () => clearInterval(timerInterval);
+        pauseBtn.onclick = () => {
+            stopTimer();
+            setStatus('计时已暂停，可继续或重置。');
+        };
 
-        // 重置计时
         resetBtn.onclick = () => {
-            clearInterval(timerInterval);
-            currentTime = isWorkMode ? WORK_SECONDS : REST_SECONDS;
-            clock.innerText = formatSecond(currentTime);
+            stopTimer();
+            currentTime = getModeDuration();
+            updateDisplay();
+            setStatus('当前模式已重置。');
         };
 
-        // 切换工作/休息模式
         switchBtn.onclick = () => {
-            clearInterval(timerInterval);
+            stopTimer();
             isWorkMode = !isWorkMode;
-            currentTime = isWorkMode ? WORK_SECONDS : REST_SECONDS;
-            modeTxt.innerText = isWorkMode ? '工作模式 · 25分钟' : '休息模式 · 5分钟';
-            switchBtn.innerText = isWorkMode ? '切换休息' : '切换工作';
-            clock.innerText = formatSecond(currentTime);
+            currentTime = getModeDuration();
+            updateDisplay();
+            setStatus(isWorkMode ? '已切换到工作模式。' : '已切换到休息模式。');
         };
 
-        // 深色浅色切换
         darkBtn.onclick = () => {
-            document.body.classList.toggle('dark');
-            darkBtn.innerText = document.body.classList.contains('dark') ? '浅色模式' : '深色模式';
+            const nextTheme = document.body.classList.contains('dark') ? 'light' : 'dark';
+            applyTheme(nextTheme);
         };
+
+        const savedTheme = localStorage.getItem(STORAGE_KEYS.theme);
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
+        updateDisplay();
     </script>
 </body>
 </html>
